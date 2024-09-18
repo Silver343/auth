@@ -41,4 +41,24 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    /**
+     * Indicate that the user has set up two factor authentication
+     */
+    public function withTwoFactor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'two_factor_secret' => 'test-secret',
+        ]);
+    }
+
+    /**
+     * Indicate that the user has set up two factor authentication
+     */
+    public function confirmed(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'two_factor_confirmed_at' => now(),
+        ]);
+    }
 }
