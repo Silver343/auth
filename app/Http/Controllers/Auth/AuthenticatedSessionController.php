@@ -50,13 +50,13 @@ class AuthenticatedSessionController extends Controller
      */
     protected function loginPipeline(LoginRequest $request)
     {
-        return (new Pipeline(app()))->send($request)->through(array_filter([
+        return (new Pipeline(app()))->send($request)->through([
             EnsureLoginIsNotThrottled::class,
             CanonicalizeUsername::class,
             RedirectIfTwoFactorAuthenticatable::class,
             AttemptToAuthenticate::class,
             PrepareAuthenticatedSession::class,
-        ]));
+        ]);
     }
 
     /**
