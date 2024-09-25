@@ -1,11 +1,11 @@
-import { PropsWithChildren, useState, useRef } from "react";
-import axios from "axios";
-import Modal from "./Modal";
-import InputError from "./InputError";
-import TextInput from "./TextInput";
-import InputLabel from "./InputLabel";
-import SecondaryButton from "./SecondaryButton";
-import PrimaryButton from "./PrimaryButton";
+import axios from 'axios';
+import { PropsWithChildren, useRef, useState } from 'react';
+import InputError from './InputError';
+import InputLabel from './InputLabel';
+import Modal from './Modal';
+import PrimaryButton from './PrimaryButton';
+import SecondaryButton from './SecondaryButton';
+import TextInput from './TextInput';
 
 export default function ConfirmsPassword({
     children,
@@ -14,68 +14,72 @@ export default function ConfirmsPassword({
     button = 'Confirm',
     confirmed = () => {},
 }: PropsWithChildren<{
-    title?: string
-    content?: string
-    button?: string
+    title?: string;
+    content?: string;
+    button?: string;
     confirmed: CallableFunction;
 }>) {
-    const [confirmingPassword, setConfirmingPassword] = useState(false)
-    const passwordInput = useRef<HTMLInputElement>(null)
+    const [confirmingPassword, setConfirmingPassword] = useState(false);
+    const passwordInput = useRef<HTMLInputElement>(null);
 
-    const [form, setForm ] = useState<{password: string, error: string, processing: boolean}>({
+    const [form, setForm] = useState<{
+        password: string;
+        error: string;
+        processing: boolean;
+    }>({
         password: '',
         error: '',
         processing: false,
-    })
+    });
 
     const startConfirmingPassword = () => {
-        axios.get(route('password.confirmation')).then(response => {
+        axios.get(route('password.confirmation')).then((response) => {
             if (response.data.confirmed) {
-                confirmed()
+                confirmed();
             } else {
                 setConfirmingPassword(true);
 
-                setTimeout(() => passwordInput.current?.focus(), 250)
+                setTimeout(() => passwordInput.current?.focus(), 250);
             }
         });
-    }
+    };
 
     const confirmPassword = () => {
-        setForm({...form, processing: true})
+        setForm({ ...form, processing: true });
 
+        axios
+            .post(route('password.confirm'), {
+                password: form.password,
+            })
+            .then(() => {
+                setForm({ ...form, processing: false });
 
-        axios.post(route('password.confirm'), {
-            password: form.password
-        }).then(() => {
-            setForm({...form, processing: false})
+                closeModal();
+                confirmed();
+            })
+            .catch((error) => {
+                setForm({
+                    ...form,
+                    processing: false,
+                    error: error.response.data.errors.password[0],
+                });
 
-            closeModal();
-            confirmed();
-        }).catch(error => {
-            setForm({
-                ...form,
-                processing: false,
-                error: error.response.data.errors.password[0]
+                passwordInput.current?.focus();
             });
-
-            passwordInput.current?.focus();
-        });
-    }
+    };
 
     const closeModal = () => {
         setConfirmingPassword(false);
         setForm({
             ...form,
             password: '',
-            error: ''
+            error: '',
         });
-    }
+    };
 
     return (
         <span>
-            <span onClick={startConfirmingPassword}>
-                {children}
-            </span>
+            <span onClick={startConfirmingPassword}>{children}</span>
             <Modal show={confirmingPassword} onClose={closeModal}>
                 <form onSubmit={confirmPassword} className="p-6">
                     <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -87,7 +91,11 @@ export default function ConfirmsPassword({
                     </p>
 
                     <div className="mt-6">
-                        <InputLabel htmlFor="password" value="Password" className="sr-only" />
+                        <InputLabel
+                            htmlFor="password"
+                            value="Password"
+                            className="sr-only"
+                        />
 
                         <TextInput
                             id="password"
@@ -95,7 +103,9 @@ export default function ConfirmsPassword({
                             name="password"
                             ref={passwordInput}
                             value={form.password}
-                            onChange={(e) => setForm({...form, 'password': e.target.value})}
+                            onChange={(e) =>
+                                setForm({ ...form, password: e.target.value })
+                            }
                             className="mt-1 block w-3/4"
                             isFocused
                             autoComplete="current-password"

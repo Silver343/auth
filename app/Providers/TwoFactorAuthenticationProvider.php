@@ -37,9 +37,9 @@ class TwoFactorAuthenticationProvider
      *
      * @return string
      */
-    public function generateSecretKey()
+    public function generateSecretKey(int $secretLength = 16)
     {
-        return $this->engine->generateSecretKey();
+        return $this->engine->generateSecretKey($secretLength);
     }
 
     /**

@@ -6,7 +6,9 @@ export interface User {
     two_factor_enabled?: boolean;
 }
 
-export type PageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+export type PageProps<
+    T extends Record<string, unknown> = Record<string, unknown>,
+> = T & {
     auth: {
         user: User;
     };
