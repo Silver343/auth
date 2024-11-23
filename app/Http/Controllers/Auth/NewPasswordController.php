@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
@@ -19,8 +21,23 @@ class NewPasswordController extends Controller
     /**
      * Display the password reset view.
      */
-    public function create(Request $request): Response
+    public function create(Request $request): Response|RedirectResponse
     {
+        $user = User::where('email', $request->email)->sole();
+
+        $lastConfirmation = $request->session()->get('auth.2fa_confirmed_at', 0);
+
+        $lastConfirmed = (Date::now()->unix() - $lastConfirmation);
+
+        $confirmed = $lastConfirmed < config('auth.two-factor.timeout');
+        if ($user->hasEnabledTwoFactorAuthentication() && ! $confirmed) {
+            return redirect()->route(
+                'password.reset.two-factor.challenge', [
+                    'email' => $request->email,
+                    'token' => $request->route('token'),
+                ]);
+        }
+
         return Inertia::render('Auth/ResetPassword', [
             'email' => $request->email,
             'token' => $request->route('token'),
@@ -59,6 +76,8 @@ class NewPasswordController extends Controller
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
         if ($status == Password::PASSWORD_RESET) {
+            $request->session()->forget('auth.2fa_confirmed_at');
+
             return redirect()->route('login')->with('status', __($status));
         }
 

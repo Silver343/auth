@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\RecoveryCodeController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\TwoFactorAuthenticatedSessionController;
 use App\Http\Controllers\Auth\TwoFactorAuthenticationController;
+use App\Http\Controllers\Auth\TwoFactorPasswordResetController;
 use App\Http\Controllers\Auth\TwoFactorQrCodeController;
 use App\Http\Controllers\Auth\TwoFactorSecretKeyController;
 use App\Http\Controllers\Auth\VerifyEmailController;
@@ -41,6 +42,13 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    Route::get('reset-password/two-factor-challenge/{token}', [TwoFactorPasswordResetController::class, 'create'])
+        ->name('password.reset.two-factor.challenge');
+
+    Route::post('reset-password/two-factor-challenge', [TwoFactorPasswordResetController::class, 'store'])
+        ->name('password.reset.two-factor.confirm')
+        ->middleware('throttle:two-factor');
 });
 
 Route::middleware('auth')->group(function () {

@@ -118,6 +118,7 @@ return [
 
     'two-factor' => [
         'secret-length' => 16,
+        'timeout' => 180,
     ],
 
 ];

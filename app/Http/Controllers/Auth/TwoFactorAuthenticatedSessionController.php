@@ -25,7 +25,7 @@ class TwoFactorAuthenticatedSessionController extends Controller
             throw new HttpResponseException(redirect()->route('login'));
         }
 
-        return Inertia::render('Auth/TwoFactorChallenge');
+        return Inertia::render('Auth/TwoFactorLoginChallenge');
     }
 
     /**
