@@ -17,6 +17,6 @@ return [
     'sent' => 'If an account exists with this email, you get an email with a password reset link.',
     'throttled' => 'Please wait before retrying.',
     'token' => 'This password reset token is invalid.',
-    'user' => 'If an account exists with this email, you get an email with a password reset link.'
+    'user' => 'If an account exists with this email, you get an email with a password reset link.',
 
 ];

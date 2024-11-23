@@ -8,7 +8,7 @@ import TextInput from '@/Components/TextInput';
 import { PageProps } from '@/types';
 import { useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 function renderSVG(SVG: string | null) {
     if (!SVG) {
@@ -44,13 +44,6 @@ export default function TwoFactorAuthenticationForm({
     const [recoveryCodes, setRecoveryCodes] = useState<string[]>([]);
 
     const twoFactorEnabled = !enabling && user.two_factor_enabled;
-
-    useEffect(() => {
-        if (twoFactorEnabled) {
-            reset();
-            clearErrors();
-        }
-    }, [twoFactorEnabled, reset, clearErrors]);
 
     const qrCodeSVG = renderSVG(qrCode);
 
@@ -96,6 +89,8 @@ export default function TwoFactorAuthenticationForm({
                 setConfirming(false);
                 setQrCode(null);
                 setSetupKey(null);
+                reset();
+                clearErrors();
             },
         });
     };
@@ -114,6 +109,8 @@ export default function TwoFactorAuthenticationForm({
             onSuccess: () => {
                 setDisabling(false);
                 setConfirming(false);
+                reset();
+                clearErrors();
             },
         });
     };
