@@ -3,11 +3,25 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, useForm } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
 
-export default function TwoFactorChallenge() {
+interface TwoFactorFormData {
+    token: string;
+    email: string;
+}
+
+interface TwoFactorChallengeFormProps {
+    onSubmit: () => void;
+    submitRoute: string;
+    initialData?: Partial<TwoFactorFormData>;
+}
+
+export default function TwoFactorChallengeForm({
+    onSubmit,
+    submitRoute,
+    initialData = {},
+}: TwoFactorChallengeFormProps) {
     const [recovery, setRecovery] = useState<boolean>(false);
     const recoveryInput = useRef<HTMLInputElement>(null);
     const codeInput = useRef<HTMLInputElement>(null);
@@ -15,6 +29,7 @@ export default function TwoFactorChallenge() {
     const { data, setData, post, processing, errors, reset } = useForm({
         code: '',
         recovery_code: '',
+        ...initialData,
     });
 
     const toggleRecovery = () => {
@@ -31,14 +46,12 @@ export default function TwoFactorChallenge() {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
-        post(route('two-factor.login'));
+        onSubmit(data);
+        post(submitRoute);
     };
-    console.log(errors.code);
-    return (
-        <GuestLayout>
-            <Head title="Two-factor Confirmation" />
 
+    return (
+        <>
             <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
                 {!recovery ? (
                     <>
@@ -102,15 +115,15 @@ export default function TwoFactorChallenge() {
                         {!recovery ? (
                             <>Use a recovery code</>
                         ) : (
-                            <>Use a authentication code</>
+                            <>Use an authentication code</>
                         )}
                     </SecondaryButton>
 
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Log in
+                        {recovery ? 'Verify' : 'Log in'}
                     </PrimaryButton>
                 </div>
             </form>
-        </GuestLayout>
+        </>
     );
 }
